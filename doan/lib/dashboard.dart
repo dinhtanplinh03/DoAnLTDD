@@ -49,14 +49,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.pie_chart),
             label: 'Biểu đồ',
+            backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.list_alt),
             label: 'Báo cáo',
+            backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Tôi',
+            backgroundColor: Colors.blue,
           ),
         ],
         currentIndex: _selectedIndex,
