@@ -5,9 +5,16 @@ class CustomersRepository {
   final dbHelper = DatabaseHelper();
 
   Future<List<Map<String, dynamic>>> getCustomers() async {
-    final db = await dbHelper.database;
-    return await db.query('Customers');
+    try {
+      final db = await dbHelper.database; // Lấy cơ sở dữ liệu từ dbHelper
+      final result = await db.query('Customers'); // Thực hiện truy vấn bảng 'Customers'
+      return result; // Trả về danh sách các dòng dữ liệu
+    } catch (e) {
+      print('Error fetching customers: $e'); // Log lỗi để dễ dàng phát hiện vấn đề
+      return []; // Trả về danh sách rỗng nếu có lỗi
+    }
   }
+
 
   /// Đăng ký tài khoản khách hàng mới
   Future<int> registerCustomer({
@@ -51,38 +58,26 @@ class CustomersRepository {
     return result.isNotEmpty;
   }
 
-  /// Cập nhật thông tin khách hàng
+  // Cập nhật thông tin khách hàng
   Future<int> updateCustomer({
     required int customerId,
     required String name,
-    String? phone,
-    String? address,
-    String? password,
+    required String phone,
+    required String address,
+    required String password,
   }) async {
     final db = await dbHelper.database;
-
-    // Tạo dữ liệu mới để cập nhật
-    final updatedCustomer = {
-      'name': name,
-      'phone': phone,
-      'address': address,
-      'password': password,
-    };
-
-    // Xóa các giá trị null khỏi map
-    updatedCustomer.removeWhere((key, value) => value == null);
-
-    try {
-      // Cập nhật thông tin khách hàng và trả về số lượng bản ghi bị ảnh hưởng
-      return await db.update(
-        'Customers',
-        updatedCustomer,
-        where: 'customer_id = ?',
-        whereArgs: [customerId],
-      );
-    } catch (e) {
-      throw Exception('Lỗi khi cập nhật thông tin khách hàng: $e');
-    }
+    return await db.update(
+      'Customers',
+      {
+        'name': name,
+        'phone': phone,
+        'address': address,
+        'password': password,
+      },
+      where: 'customer_id = ?',
+      whereArgs: [customerId],
+    );
   }
 // Thêm các phương thức xử lý khác cho bảng Customers nếu cần
 }

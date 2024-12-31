@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:untitled4/database/products_repository.dart';
+import 'package:untitled4/database/customers_repository.dart';
 import 'package:untitled4/screens/login_form.dart';
 
 class AdminPage extends StatefulWidget {
@@ -12,14 +13,18 @@ class AdminPage extends StatefulWidget {
 
 class _AdminPageState extends State<AdminPage> {
   late ProductsRepository _productsRepository;
+  late CustomersRepository _customersRepository;
   List<Map<String, dynamic>> _products = [];
+  List<Map<String, dynamic>> _customers = [];
   final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
     _productsRepository = ProductsRepository();
+    _customersRepository = CustomersRepository();
     _loadProducts();
+    _loadCustomers();
   }
 
   // Lấy danh sách sản phẩm từ cơ sở dữ liệu
@@ -27,6 +32,14 @@ class _AdminPageState extends State<AdminPage> {
     List<Map<String, dynamic>> products = await _productsRepository.getProducts();
     setState(() {
       _products = products;
+    });
+  }
+
+  // Lấy danh sách khách hàng từ cơ sở dữ liệu
+  Future<void> _loadCustomers() async {
+    List<Map<String, dynamic>> customers = await _customersRepository.getCustomers();
+    setState(() {
+      _customers = customers;
     });
   }
 
@@ -174,7 +187,7 @@ class _AdminPageState extends State<AdminPage> {
             );
           },
         ),
-          title: Text('Admin Page'),
+        title: Text('Admin Page'),
       ),
       body: DefaultTabController(
         length: 3,
@@ -190,7 +203,60 @@ class _AdminPageState extends State<AdminPage> {
             Expanded(
               child: TabBarView(
                 children: [
-                  Center(child: Text('Customers management here')),
+                  // Tab Customers
+                  Center(
+                    child: _customers.isEmpty
+                        ? Text('Chưa có thông tin khách hàng.')
+                        : ListView.builder(
+                      itemCount: _customers.length,
+                      itemBuilder: (context, index) {
+                        final customer = _customers[index];
+                        return ListTile(
+                          leading: Icon(Icons.person, size: 50),
+                          title: Text(customer['name']),
+                          subtitle: Text('Email: ${customer['email']}\nSĐT: ${customer['phone']}'),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () async {
+                              bool? confirm = await showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: Text('Xác nhận'),
+                                  content: Text('Bạn có chắc chắn muốn xóa khách hàng này không?'),
+                                  actions: [
+                                    TextButton(
+                                      child: Text('Hủy'),
+                                      onPressed: () => Navigator.pop(context, false),
+                                    ),
+                                    TextButton(
+                                      child: Text('Xóa'),
+                                      onPressed: () => Navigator.pop(context, true),
+                                    ),
+                                  ],
+                                ),
+                              );
+
+                              if (confirm == true) {
+                                try {
+                                  // Thêm logic xóa khách hàng ở đây
+                                  // await _customersRepository.deleteCustomer(customer['customer_id']);
+                                  _loadCustomers(); // Làm mới danh sách khách hàng
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Khách hàng đã được xóa thành công.')),
+                                  );
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Lỗi khi xóa khách hàng: $e')),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  // Tab Products
                   Column(
                     children: [
                       ElevatedButton(
@@ -258,6 +324,7 @@ class _AdminPageState extends State<AdminPage> {
                       ),
                     ],
                   ),
+                  // Tab Orders
                   Center(child: Text('Orders management here')),
                 ],
               ),

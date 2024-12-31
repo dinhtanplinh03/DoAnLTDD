@@ -3,6 +3,9 @@ import 'package:untitled4/database/customers_repository.dart'; // Import reposit
 import 'home.dart';
 import 'registration_form.dart';  // Dẫn đến trang đăng ký
 import 'package:untitled4/admin/admin.dart';  // Import trang Admin (tạo trang Admin ở đây)
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';  // Đảm bảo bạn đã import sqflite để làm việc với cơ sở dữ liệu
+import 'package:untitled4/database/database_helper.dart';
 
 class LoginForm extends StatefulWidget {
   @override
@@ -15,55 +18,56 @@ class _LoginFormState extends State<LoginForm> {
   final TextEditingController _passwordController = TextEditingController();
 
   final CustomersRepository _customersRepository = CustomersRepository();
+  late DatabaseHelper _dbHelper; // Khai báo _dbHelper
 
-  Future<void> _loginUser(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        // Kiểm tra nếu số điện thoại là "0123456789" và mật khẩu là "admin"
-        if (_phoneController.text == "0123456789" && _passwordController.text == "admin") {
-          // Điều hướng đến trang Admin
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => AdminPage()), // Chuyển đến trang Admin
-          );
-        } else {
-          // Kiểm tra số điện thoại và mật khẩu trong cơ sở dữ liệu
-          final isExist = await _customersRepository.isPhoneExist(_phoneController.text);
+  @override
+  void initState() {
+    super.initState();
+    _dbHelper = DatabaseHelper(); // Khởi tạo _dbHelper
+  }
 
-          if (isExist) {
-            final db = await _customersRepository.dbHelper.database;
-            final List<Map<String, dynamic>> users = await db.query(
-              'Customers',
-              where: 'phone = ? AND password = ?',
-              whereArgs: [_phoneController.text, _passwordController.text],
-            );
+  Future<bool> _login(String phone, String password) async {
+    Database db = await _dbHelper.database;
+    List<Map<String, dynamic>> result = await db.query(
+      'Customers',
+      where: 'phone = ? AND password = ?',
+      whereArgs: [phone, password],
+    );
 
-            if (users.isNotEmpty) {
-              // Đăng nhập thành công
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Đăng nhập thành công!')),
-              );
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Home()), // Điều hướng tới trang Home
-              );
-            } else {
-              // Mật khẩu không đúng
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Mật khẩu không đúng!')),
-              );
-            }
-          } else {
-            // Số điện thoại không tồn tại
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Số điện thoại không tồn tại!')),
-            );
-          }
-        }
-      } catch (e) {
-        // Xử lý lỗi nếu có
+    if (result.isNotEmpty) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('userId', result.first['customer_id']); // Lưu ID vào SharedPreferences
+      return true;
+    }
+    return false;
+  }
+
+
+
+  // Hàm gọi để thực hiện đăng nhập
+  void _loginUser(BuildContext context) async {
+    final phone = _phoneController.text;
+    final password = _passwordController.text;
+
+    if (phone == '0123456789' && password == 'admin') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AdminPage()), // Trang AdminPage
+      );
+      return;
+    }
+
+    if (_formKey.currentState?.validate() ?? false) {
+      bool success = await _login(phone, password);
+      if (success) {
+        // Điều hướng đến màn hình chính hoặc trang Admin nếu cần
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),  // Giả sử bạn có một trang HomePage
+        );
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đăng nhập thất bại: $e')),
+          SnackBar(content: Text('Đăng nhập không thành công.')),
         );
       }
     }
