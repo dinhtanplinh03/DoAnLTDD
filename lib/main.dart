@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'login_form.dart';
+import 'screens/login_form.dart';
+import 'screens/registration_form.dart';
+import 'path.dart';
+import 'admin/admin.dart';
+import 'screens/profile.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,7 +13,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Form Đăng Nhập và Đăng Ký',
+      title: 'HUSUKI',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
