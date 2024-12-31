@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
-import 'screens/login_form.dart';
-import 'screens/registration_form.dart';
-import 'path.dart';
-import 'admin/admin.dart';
-import 'screens/profile.dart';
+import 'screens/Login.dart'; // Đảm bảo rằng đường dẫn đúng với file LoginPage.dart của bạn
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp ({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'HUSUKI',
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false, // Tắt banner debug
+      title: 'App Bán Mỹ Phẩm',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.pink, // Tùy chỉnh màu sắc chính cho ứng dụng
       ),
-      home: LoginForm(),
+      home: LoginPage(), // Màn hình đăng nhập là màn hình chính
     );
   }
 }
