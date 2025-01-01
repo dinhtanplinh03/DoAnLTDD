@@ -1,86 +1,119 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:untitled7/preferences/preferences_helper.dart';
+import 'package:untitled7/Models/databasehelper.dart'; // Đảm bảo đã import DatabaseHelper và Order model
+import 'package:untitled7/Models/Order.dart';
+import 'package:untitled7/screens/OrderDetail.dart';
 
-
-class OrderPage extends StatefulWidget {
-  @override
-  _OrderPageState createState() => _OrderPageState();
+// Hàm trả về trạng thái tương ứng với status
+String getStatusText(int status) {
+  switch (status) {
+    case 0:
+      return 'Đã hủy';
+    case 1:
+      return 'Đang giao';
+    case 2:
+      return 'Hoàn thành';
+    default:
+      return 'Không xác định';
+  }
 }
 
-class _OrderPageState extends State<OrderPage> {
-  int? userId;
-
-  // Method to get the userId from SharedPreferences
-  static Future<int?> getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('userId');
+// Hàm trả về màu sắc tương ứng với status
+Color getStatusColor(int status) {
+  switch (status) {
+    case 0:
+      return Colors.red; // Màu đỏ cho trạng thái đã hủy
+    case 1:
+      return Colors.orange; // Màu cam cho trạng thái đang giao
+    case 2:
+      return Colors.green; // Màu xanh cho trạng thái hoàn thành
+    default:
+      return Colors.black; // Màu đen nếu không xác định
   }
+}
 
-  @override
-  void initState() {
-    super.initState();
-    // Fetch the userId when the page is initialized
-    getUserId().then((id) {
-      setState(() {
-        userId = id;
-      });
-    });
-  }
+class OrderPage extends StatelessWidget {
+  const OrderPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order Page'),
+        title: const Text('Đơn hàng'),
       ),
-      body: Center(
-        child: userId == null
-            ? CircularProgressIndicator()  // Show loading indicator while fetching userId
-            : FutureBuilder(
-          future: _fetchOrders(userId!),  // Fetch orders based on the userId
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Text('No orders found');
-            } else {
-              var orders = snapshot.data;
+      body: FutureBuilder<int?>(
+        future: PreferencesHelper.getUserId(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return const Center(child: Text('Lỗi khi lấy userId'));
+          }
+
+          final customerId = snapshot.data;
+          if (customerId == null) {
+            return const Center(child: Text('Chưa đăng nhập'));
+          }
+
+          // Truy vấn đơn hàng theo customerId
+          return FutureBuilder<List<Order>>(
+            future: DatabaseHelper().getOrdersByCustomerId(customerId),
+            builder: (context, orderSnapshot) {
+              if (orderSnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (orderSnapshot.hasError) {
+                return const Center(child: Text('Lỗi khi tải đơn hàng'));
+              }
+
+              if (!orderSnapshot.hasData || orderSnapshot.data!.isEmpty) {
+                return const Center(child: Text('Không có đơn hàng'));
+              }
+
+              // Hiển thị danh sách đơn hàng
               return ListView.builder(
-                itemCount: orders?.length,
+                itemCount: orderSnapshot.data!.length,
                 itemBuilder: (context, index) {
-                  // Customize how you display each order item
-                  return ListTile(
-                    title: Text('Order ID: ${orders?[index].id}'),
-                    subtitle: Text('Order details: ${orders?[index].details}'),
+                  final order = orderSnapshot.data![index];
+                  return Card(
+                    margin: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      title: Text('Đơn hàng ${order.orderId}'),
+                      subtitle: Text('Ngày: ${order.orderDate}'),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Tổng: ${order.totalAmount} VNĐ'),
+                          Text(
+                            getStatusText(order.status), // Hiển thị trạng thái
+                            style: TextStyle(
+                              color: getStatusColor(order.status),
+                              // Màu sắc tùy thuộc vào trạng thái
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        // Điều hướng đến màn hình chi tiết đơn hàng
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OrderDetailPage(order: order),
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               );
-            }
-          },
-        ),
+            },
+          );
+        },
       ),
     );
   }
-
-  // Method to fetch orders from an API or database based on the userId
-  Future<List<Order>> _fetchOrders(int userId) async {
-    // Replace with your API call or database query to fetch orders
-    // Example:
-    await Future.delayed(Duration(seconds: 2));  // Simulating network delay
-
-    // Return a sample list of orders
-    return [
-      Order(id: 1, details: 'Order 1 details'),
-      Order(id: 2, details: 'Order 2 details'),
-    ];
-  }
-}
-
-class Order {
-  final int id;
-  final String details;
-
-  Order({required this.id, required this.details});
 }

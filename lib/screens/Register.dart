@@ -4,6 +4,8 @@ import 'package:untitled7/Models/Customer.dart';
 import 'package:untitled7/screens/Login.dart';
 
 class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
@@ -29,7 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
       // Kiểm tra xem các trường name và address có bị trống không
       if (name.isEmpty || address.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Tên và địa chỉ không thể để trống')),
+          const SnackBar(content: Text('Tên và địa chỉ không thể để trống')),
         );
         return;
       }
@@ -50,14 +52,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
       // Hiển thị thông báo thành công
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Đăng ký thành công!')),
+        const SnackBar(content: Text('Đăng ký thành công!')),
       );
 
       // Chuyển hướng sang màn hình đăng nhập sau một khoảng thời gian ngắn
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 2), () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
+          MaterialPageRoute(builder: (context) => const LoginPage()),
         );
       });
     }
@@ -68,10 +70,10 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Đăng ký tài khoản'),
+        title: const Text('Đăng ký tài khoản'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -80,7 +82,7 @@ class _RegisterPageState extends State<RegisterPage> {
               // Trường tên người dùng
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Tên',
                   border: OutlineInputBorder(),
                 ),
@@ -91,12 +93,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
 
               // Trường địa chỉ người dùng
               TextFormField(
                 controller: _addressController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Địa chỉ',
                   border: OutlineInputBorder(),
                 ),
@@ -107,12 +109,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
 
               // Trường số điện thoại
               TextFormField(
                 controller: _phoneController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Số điện thoại',
                   border: OutlineInputBorder(),
                 ),
@@ -123,12 +125,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
 
               // Trường mật khẩu
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Mật khẩu',
                   border: OutlineInputBorder(),
                 ),
@@ -140,16 +142,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
 
               // Nút đăng ký
               ElevatedButton(
                 onPressed: () => _registerUser(context),
-                child: Text('Đăng ký'),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 12.0),
-                  textStyle: TextStyle(fontSize: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  textStyle: const TextStyle(fontSize: 16),
                 ),
+                child: const Text('Đăng ký'),
               ),
             ],
           ),

@@ -8,7 +8,7 @@ import 'dart:io';
 class ProductDetailPage extends StatefulWidget {
   final int productId; // ID của sản phẩm được truyền vào
 
-  const ProductDetailPage({Key? key, required this.productId}) : super(key: key);
+  const ProductDetailPage({super.key, required this.productId});
 
   @override
   _ProductDetailPageState createState() => _ProductDetailPageState();
@@ -55,12 +55,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
       // Hiển thị thông báo thành công
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sản phẩm đã được thêm vào giỏ hàng!')),
+        const SnackBar(content: Text('Sản phẩm đã được thêm vào giỏ hàng!')),
       );
     } catch (e) {
       // Hiển thị thông báo lỗi nếu thêm không thành công
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi: Không thể thêm sản phẩm vào giỏ hàng.')),
+        const SnackBar(content: Text('Lỗi: Không thể thêm sản phẩm vào giỏ hàng.')),
       );
     }
   }
@@ -69,17 +69,17 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chi tiết sản phẩm'),
+        title: const Text('Chi tiết sản phẩm'),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _productDetails,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Có lỗi xảy ra.'));
+            return const Center(child: Text('Có lỗi xảy ra.'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('Không tìm thấy sản phẩm.'));
+            return const Center(child: Text('Không tìm thấy sản phẩm.'));
           } else {
             final product = snapshot.data!;
             String? imageUrl = product['image_url']; // Lấy đường dẫn hình ảnh từ CSDL
@@ -93,42 +93,42 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   Center(
                     child: imageUrl != null && imageUrl.isNotEmpty
                         ? Image.file(File(imageUrl), height: 200, fit: BoxFit.cover)
-                        : Text('Không có hình ảnh'), // Hiển thị thông báo nếu không có hình ảnh
+                        : const Text('Không có hình ảnh'), // Hiển thị thông báo nếu không có hình ảnh
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Tên sản phẩm
                   Text(
                     product['name'],
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
                   // Giá sản phẩm
                   Text(
                     'Giá: \$${product['price']}',
-                    style: TextStyle(fontSize: 20, color: Colors.green),
+                    style: const TextStyle(fontSize: 20, color: Colors.green),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Mô tả sản phẩm
-                  Text(
+                  const Text(
                     'Mô tả:',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     product['description'] ?? 'Không có mô tả',
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Nút Thêm vào giỏ hàng
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      icon: Icon(Icons.shopping_cart),
-                      label: Text('Thêm vào giỏ hàng'),
+                      icon: const Icon(Icons.shopping_cart),
+                      label: const Text('Thêm vào giỏ hàng'),
                       onPressed: () => _addToCart(product),
                     ),
                   ),
@@ -137,12 +137,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      icon: Icon(Icons.shopping_bag),
-                      label: Text('Xem giỏ hàng'),
+                      icon: const Icon(Icons.shopping_bag),
+                      label: const Text('Xem giỏ hàng'),
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => CartPage()), // Giả sử bạn có trang CartPage
+                          MaterialPageRoute(builder: (context) => const CartPage()), // Giả sử bạn có trang CartPage
                         );
                       },
                     ),

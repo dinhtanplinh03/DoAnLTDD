@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CartPage extends StatefulWidget {
+  const CartPage({super.key});
+
   @override
   _CartPageState createState() => _CartPageState();
 }
@@ -98,7 +100,7 @@ class _CartPageState extends State<CartPage> {
     // Check if userId is null (i.e., not found)
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Không tìm thấy thông tin người dùng!')), // User information not found
+        const SnackBar(content: Text('Không tìm thấy thông tin người dùng!')), // User information not found
       );
       return; // Exit the function if userId is not available
     }
@@ -177,11 +179,11 @@ class _CartPageState extends State<CartPage> {
       await _clearCart();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Đặt hàng thành công!')), // Order placed successfully
+        const SnackBar(content: Text('Đặt hàng thành công!')), // Order placed successfully
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Không đủ số lượng sản phẩm trong kho.')), // Insufficient stock
+        const SnackBar(content: Text('Không đủ số lượng sản phẩm trong kho.')), // Insufficient stock
       );
     }
   }
@@ -201,17 +203,17 @@ class _CartPageState extends State<CartPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Giỏ hàng'),
+        title: const Text('Giỏ hàng'),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>( // FutureBuilder to load cart items
         future: _cartItems,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Có lỗi xảy ra.'));
+            return const Center(child: Text('Có lỗi xảy ra.'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('Giỏ hàng trống.'));
+            return const Center(child: Text('Giỏ hàng trống.'));
           } else {
             final cartItems = snapshot.data!;
             return Column(
@@ -229,23 +231,23 @@ class _CartPageState extends State<CartPage> {
                           height: 50,
                           fit: BoxFit.cover,
                         )
-                            : Icon(Icons.image, size: 50),
+                            : const Icon(Icons.image, size: 50),
                         title: Text(item['name']),
                         subtitle: Text('Giá: \$${item['price']}'),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: Icon(Icons.remove),
+                              icon: const Icon(Icons.remove),
                               onPressed: () => _updateQuantity(item['id'], item['quantity'] - 1),
                             ),
                             Text('${item['quantity']}'),
                             IconButton(
-                              icon: Icon(Icons.add),
+                              icon: const Icon(Icons.add),
                               onPressed: () => _updateQuantity(item['id'], item['quantity'] + 1),
                             ),
                             IconButton(
-                              icon: Icon(Icons.delete),
+                              icon: const Icon(Icons.delete),
                               onPressed: () => _removeItem(item['id']),
                             ),
                           ],
@@ -258,22 +260,22 @@ class _CartPageState extends State<CartPage> {
                   future: _calculateTotalAmount(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     } else if (snapshot.hasError) {
-                      return Text('Có lỗi xảy ra.');
+                      return const Text('Có lỗi xảy ra.');
                     } else {
                       return Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            const Text(
                               'Tổng cộng:',
                               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Text(
                               '\$${snapshot.data!.toStringAsFixed(2)}',
-                              style: TextStyle(fontSize: 20, color: Colors.green),
+                              style: const TextStyle(fontSize: 20, color: Colors.green),
                             ),
                           ],
                         ),
@@ -285,7 +287,7 @@ class _CartPageState extends State<CartPage> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _placeOrder, // Place the order
-                    child: Text('Đặt hàng'),
+                    child: const Text('Đặt hàng'),
                   ),
                 ),
               ],

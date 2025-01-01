@@ -56,7 +56,7 @@ class Customer {
     int? status,
   }) {
     return Customer(
-      customer_id: id ?? this.customer_id,
+      customer_id: id ?? customer_id,
       phone: phone ?? this.phone,
       password: password ?? this.password,
       role: role ?? this.role,

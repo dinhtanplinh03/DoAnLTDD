@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class AddProductPage extends StatefulWidget {
+  const AddProductPage({super.key});
+
   @override
   _AddProductPageState createState() => _AddProductPageState();
 }
@@ -33,7 +35,7 @@ class _AddProductPageState extends State<AddProductPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Thêm Sản Phẩm')),
+      appBar: AppBar(title: const Text('Thêm Sản Phẩm')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -43,23 +45,23 @@ class _AddProductPageState extends State<AddProductPage> {
               // Các trường nhập liệu khác
               TextFormField(
                 controller: _productNameController,
-                decoration: InputDecoration(labelText: 'Tên sản phẩm'),
+                decoration: const InputDecoration(labelText: 'Tên sản phẩm'),
                 validator: (value) => value!.isEmpty ? 'Vui lòng nhập tên sản phẩm' : null,
               ),
               TextFormField(
                 controller: _productPriceController,
-                decoration: InputDecoration(labelText: 'Giá'),
+                decoration: const InputDecoration(labelText: 'Giá'),
                 keyboardType: TextInputType.number,
                 validator: (value) => value!.isEmpty ? 'Vui lòng nhập giá sản phẩm' : null,
               ),
               TextFormField(
                 controller: _productDescriptionController,
-                decoration: InputDecoration(labelText: 'Mô tả'),
+                decoration: const InputDecoration(labelText: 'Mô tả'),
                 validator: (value) => value!.isEmpty ? 'Vui lòng nhập mô tả' : null,
               ),
               TextFormField(
                 controller: _productStockController,
-                decoration: InputDecoration(labelText: 'Số lượng trong kho'),
+                decoration: const InputDecoration(labelText: 'Số lượng trong kho'),
                 keyboardType: TextInputType.number,
                 validator: (value) => value!.isEmpty ? 'Vui lòng nhập số lượng' : null,
               ),
@@ -67,7 +69,7 @@ class _AddProductPageState extends State<AddProductPage> {
               // Thêm button để chọn ảnh
               ElevatedButton(
                 onPressed: _pickImage,
-                child: Text('Chọn hình ảnh sản phẩm'),
+                child: const Text('Chọn hình ảnh sản phẩm'),
               ),
               if (_image != null)
                 Padding(
@@ -78,7 +80,7 @@ class _AddProductPageState extends State<AddProductPage> {
               // Nút thêm sản phẩm
               ElevatedButton(
                 onPressed: _addProduct,
-                child: Text('Thêm sản phẩm'),
+                child: const Text('Thêm sản phẩm'),
               ),
             ],
           ),
@@ -113,7 +115,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
       // Thông báo thêm sản phẩm thành công
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Thêm sản phẩm thành công!')),
+        const SnackBar(content: Text('Thêm sản phẩm thành công!')),
       );
 
       // Truyền kết quả thành công về trang trước

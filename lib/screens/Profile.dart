@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled7/screens/Login.dart';
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -50,7 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
     // Điều hướng về trang đăng nhập
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
+      MaterialPageRoute(builder: (context) => const LoginPage()),
     );
   }
 
@@ -58,10 +60,10 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Trang cá nhân'),
+        title: const Text('Trang cá nhân'),
         actions: [
           IconButton(
-            icon: Icon(Icons.exit_to_app),
+            icon: const Icon(Icons.exit_to_app),
             onPressed: () => _logout(context), // Gọi phương thức đăng xuất
           ),
         ],
@@ -70,11 +72,11 @@ class _ProfilePageState extends State<ProfilePage> {
         future: _userProfile,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Có lỗi xảy ra: ${snapshot.error}'));
           } else if (!snapshot.hasData) {
-            return Center(child: Text('Không có dữ liệu'));
+            return const Center(child: Text('Không có dữ liệu'));
           } else {
             final user = snapshot.data!;
             return Padding(

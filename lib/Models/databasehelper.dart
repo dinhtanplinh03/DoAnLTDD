@@ -1,5 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:untitled7/Models/Order.dart';
+import 'package:untitled7/Models/OrderDetails.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -94,5 +96,33 @@ class DatabaseHelper {
   Future<void> getDatabasePath() async {
     final databasesPath = await getDatabasesPath();
     print('Database path: $databasesPath');
+  }
+
+  // Get orders by customer ID
+  Future<List<Order>> getOrdersByCustomerId(int customerId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'Orders',  // Make sure to use the correct table name
+      where: 'customer_id = ?',
+      whereArgs: [customerId],
+    );
+
+    return List.generate(maps.length, (i) {
+      return Order.fromMap(maps[i]);
+    });
+  }
+
+  // Hàm lấy chi tiết đơn hàng từ database
+  Future<List<OrderDetail>> fetchOrderDetails(int orderId) async {
+    final db = await DatabaseHelper().database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'OrderDetails',
+      where: 'order_id = ?',
+      whereArgs: [orderId],
+    );
+
+    return List.generate(maps.length, (i) {
+      return OrderDetail.fromMap(maps[i]);
+    });
   }
 }

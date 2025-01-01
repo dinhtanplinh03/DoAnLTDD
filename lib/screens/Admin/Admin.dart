@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled7/Models/databasehelper.dart'; // Đảm bảo bạn có lớp DatabaseHelper để truy vấn dữ liệu từ DB
 import 'package:untitled7/screens/Admin/AddProduct.dart';
 import 'package:untitled7/screens/Login.dart';
+import 'package:untitled7/screens/Order.dart';
 
 class AdminPage extends StatefulWidget {
   @override
@@ -13,13 +14,25 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
   late Future<List<Map<String, dynamic>>> _products;
   late TabController _tabController;
 
+  late Future<List<Map<String, dynamic>>> _orders; // Biến để lưu đơn hàng
+
   @override
   void initState() {
     super.initState();
     _customers = _fetchCustomers();
     _products = _fetchProducts();
-    _tabController = TabController(length: 2, vsync: this); // Khởi tạo TabController với 2 tab
+    _orders = _fetchOrders(); // Lấy danh sách đơn hàng
+    _tabController = TabController(length: 3, vsync: this); // Cập nhật length thành 3
   }
+
+// Hàm lấy danh sách đơn hàng
+  Future<List<Map<String, dynamic>>> _fetchOrders() async {
+    DatabaseHelper dbHelper = DatabaseHelper();
+    final db = await dbHelper.database;
+    final result = await db.query('Orders'); // Lấy dữ liệu từ bảng Orders
+    return result;
+  }
+
 
   // Hàm lấy danh sách người dùng
   Future<List<Map<String, dynamic>>> _fetchCustomers() async {
@@ -45,6 +58,8 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +76,7 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
           tabs: const [
             Tab(text: 'Người Dùng'),
             Tab(text: 'Sản Phẩm'),
+            Tab(text: 'Đơn hàng',)
           ],
         ),
       ),
@@ -144,6 +160,45 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
                           },
                           child: const Text('Khóa/Mở khóa'),
                         ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+            // Tab 3: Danh sách đơn hàng
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: _orders,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text('Có lỗi xảy ra.'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('Không có đơn hàng.'));
+                } else {
+                  final orders = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: orders.length,
+                    itemBuilder: (context, index) {
+                      final order = orders[index];
+                      final orderId = order['order_id'] ?? -1;
+                      final orderDate = order['orderDate'] ?? 'Không có ngày';
+                      final totalAmount = order['total_amount'] ?? 0.0;
+                      final status = order['status'] ?? 0;
+                      return ListTile(
+                        title: Text('Đơn hàng #$orderId'),
+                        subtitle: Text('Ngày: $orderDate'),
+                        trailing: Text(
+                          getStatusText(status),
+                          style: TextStyle(
+                            color: getStatusColor(status),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () {
+                          // Xử lý khi nhấn vào đơn hàng, điều hướng đến trang chi tiết đơn hàng
+                        },
                       );
                     },
                   );
