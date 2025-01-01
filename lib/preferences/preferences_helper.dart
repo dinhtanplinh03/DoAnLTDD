@@ -18,4 +18,16 @@ class PreferencesHelper {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('userId');  // Xóa userId khỏi SharedPreferences
   }
+
+  // Lưu ID đơn hàng
+  Future<void> saveOrderId(int orderId) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('orderId', orderId);
+  }
+
+  // Lấy ID đơn hàng
+  Future<int?> getOrderId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('orderId');
+  }
 }

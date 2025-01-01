@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:untitled5/Models/databeshelper.dart'; // Import lớp DatabaseHelper nếu cần
-import 'package:untitled5/screens/CartPage.dart'; // Giả sử bạn có trang giỏ hàng
+import 'package:untitled7/Models/databasehelper.dart'; // Import lớp DatabaseHelper nếu cần
+import 'package:untitled7/Models/Cart.dart'; // Import model Cart
+import 'package:untitled7/screens/Cart.dart'; // Giả sử bạn có trang giỏ hàng
+import 'package:sqflite/sqflite.dart';
+import 'dart:io';
 
 class ProductDetailPage extends StatefulWidget {
   final int productId; // ID của sản phẩm được truyền vào
@@ -34,22 +37,32 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   // Hàm thêm sản phẩm vào giỏ hàng
   Future<void> _addToCart(Map<String, dynamic> product) async {
-    // Đảm bảo rằng bạn có logic cho giỏ hàng trong cơ sở dữ liệu
-    DatabaseHelper dbHelper = DatabaseHelper();
-    final db = await dbHelper.database;
+    try {
+      final cartItem = Cart(
+        productId: product['product_id'],
+        name: product['name'],
+        price: product['price'],
+        quantity: 1, // Mặc định thêm 1 sản phẩm vào giỏ
+      );
 
-    // Giả sử giỏ hàng là một bảng "Cart"
-    await db.insert('Cart', {
-      'product_id': product['product_id'],
-      'name': product['name'],
-      'price': product['price'],
-      'quantity': 1, // Mặc định là 1
-    });
+      DatabaseHelper dbHelper = DatabaseHelper();
+      final db = await dbHelper.database;
+      await db.insert(
+        'Cart',
+        cartItem.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
 
-    // Hiển thị thông báo
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Đã thêm vào giỏ hàng!')),
-    );
+      // Hiển thị thông báo thành công
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sản phẩm đã được thêm vào giỏ hàng!')),
+      );
+    } catch (e) {
+      // Hiển thị thông báo lỗi nếu thêm không thành công
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi: Không thể thêm sản phẩm vào giỏ hàng.')),
+      );
+    }
   }
 
   @override
@@ -69,18 +82,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             return Center(child: Text('Không tìm thấy sản phẩm.'));
           } else {
             final product = snapshot.data!;
+            String? imageUrl = product['image_url']; // Lấy đường dẫn hình ảnh từ CSDL
+
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Hình ảnh sản phẩm
+                  // Hình ảnh sản phẩm từ file
                   Center(
-                    child: Image.network(
-                      product['image_url'] ?? '',
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
+                    child: imageUrl != null && imageUrl.isNotEmpty
+                        ? Image.file(File(imageUrl), height: 200, fit: BoxFit.cover)
+                        : Text('Không có hình ảnh'), // Hiển thị thông báo nếu không có hình ảnh
                   ),
                   SizedBox(height: 16),
 

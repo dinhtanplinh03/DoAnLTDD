@@ -5,8 +5,9 @@ class Product {
   double price;
   int stock;
   String? imageUrl;
-  int? categoryId;
+  int status;
 
+  // Constructor with default value for status
   Product({
     this.productId,
     required this.name,
@@ -14,10 +15,10 @@ class Product {
     required this.price,
     required this.stock,
     this.imageUrl,
-    this.categoryId,
+    this.status = 1, // Default value for status is 1
   });
 
-  // Convert Product object to Map
+  // Convert Product object to Map for database insertion
   Map<String, dynamic> toMap() {
     return {
       'product_id': productId,
@@ -26,7 +27,7 @@ class Product {
       'price': price,
       'stock': stock,
       'image_url': imageUrl,
-      'category_id': categoryId,
+      'status': status,
     };
   }
 
@@ -39,7 +40,7 @@ class Product {
       price: map['price'],
       stock: map['stock'],
       imageUrl: map['image_url'],
-      categoryId: map['category_id'],
+      status: map['status'] ?? 1, // Ensure status defaults to 1 if null
     );
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:untitled5/Models/databeshelper.dart'; // Đảm bảo bạn có lớp DatabaseHelper để truy vấn dữ liệu từ DB
-import 'package:untitled5/screens/HomePage.dart';  // Giả sử bạn có trang HomePage cho người dùng
-import 'package:untitled5/screens/Admin/AdminPage.dart';
-import 'package:untitled5/screens/Register.dart';// Giả sử bạn có trang AdminPage cho quản trị viên
+import 'package:untitled7/Models/databasehelper.dart'; // Đảm bảo bạn có lớp DatabaseHelper để truy vấn dữ liệu từ DB
+import 'package:untitled7/screens/Home.dart';  // Giả sử bạn có trang HomePage cho người dùng
+import 'package:untitled7/screens/Admin/Admin.dart';
+import 'package:untitled7/screens/Register.dart';// Giả sử bạn có trang AdminPage cho quản trị viên
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -26,19 +26,19 @@ class _LoginPageState extends State<LoginPage> {
     final phone = _phoneController.text;
     final password = _passwordController.text;
 
-    // Kiểm tra thông tin đăng nhập
+    // Kiểm tra thông tin đăng nhập, chỉ lấy tài khoản có status = 1 (mở khóa)
     DatabaseHelper dbHelper = DatabaseHelper();
     final db = await dbHelper.database;
     final result = await db.query(
       'Customers',
-      where: 'phone = ? AND password = ?',
+      where: 'phone = ? AND password = ? AND status = 1', // Thêm điều kiện status = 1
       whereArgs: [phone, password],
     );
 
     if (result.isNotEmpty) {
       // Lưu id vào SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      final userId = result[0]['id'] as int;  // Ép kiểu từ Object? sang int
+      final userId = result[0]['customer_id'] as int;  // Ép kiểu từ Object? sang int
       await prefs.setInt('userId', userId);  // Lưu ID người dùng
 
       // Kiểm tra role
@@ -57,12 +57,13 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } else {
-      // Nếu không tìm thấy người dùng trong DB
+      // Nếu không tìm thấy người dùng trong DB hoặc tài khoản bị khóa
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Đăng nhập không thành công.')),
+        SnackBar(content: Text('Đăng nhập không thành công hoặc tài khoản bị khóa.')),
       );
     }
   }
+
 
 
 
@@ -118,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   // Điều hướng đến trang đăng ký (nếu có)
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => RegisterPage()),);
+                    MaterialPageRoute(builder: (context) => RegisterPage()),);
                 },
                 child: Text('Chưa có tài khoản? Đăng ký ngay'),
               ),

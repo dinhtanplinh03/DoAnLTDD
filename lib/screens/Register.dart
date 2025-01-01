@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:untitled5/Models/databeshelper.dart';
-import 'package:untitled5/Models/Customer.dart';
-import 'package:untitled5/screens/Login.dart';
+import 'package:untitled7/Models/databasehelper.dart';
+import 'package:untitled7/Models/Customer.dart';
+import 'package:untitled7/screens/Login.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -15,7 +14,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _roleController = TextEditingController();
+
 
   // Hàm đăng ký người dùng
   Future<void> _registerUser(BuildContext context) async {

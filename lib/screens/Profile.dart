@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:untitled5/preferences/preferences_helper.dart';  // Import file PreferencesHelper
-import 'package:untitled5/Models/databeshelper.dart';
+import 'package:untitled7/preferences/preferences_helper.dart';  // Import file PreferencesHelper
+import 'package:untitled7/Models/databasehelper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:untitled5/screens/Login.dart';
+import 'package:untitled7/screens/Login.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -29,7 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final db = await dbHelper.database;
     final result = await db.query(
       'Customers',
-      where: 'id = ?',
+      where: 'customer_id = ?',
       whereArgs: [userId],
     );
 
@@ -58,13 +58,13 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text('Trang cá nhân'),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.exit_to_app),
-              onPressed: () => _logout(context), // Gọi phương thức đăng xuất
-            ),
-          ],
+        title: Text('Trang cá nhân'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: () => _logout(context), // Gọi phương thức đăng xuất
+          ),
+        ],
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _userProfile,

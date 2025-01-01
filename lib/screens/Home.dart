@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:untitled5/Models/databeshelper.dart'; // Đảm bảo bạn có lớp DatabaseHelper để truy vấn dữ liệu từ DB
-import 'package:untitled5/screens/ProductDetailPage.dart'; // Giả sử bạn có trang chi tiết sản phẩm
-import 'package:untitled5/screens/CartPage.dart';
-import 'package:untitled5/screens/ProfilePage.dart';
+import 'package:untitled7/Models/databasehelper.dart'; // Đảm bảo bạn có lớp DatabaseHelper để truy vấn dữ liệu từ DB
+import 'package:untitled7/screens/ProductDetail.dart';
+import 'package:untitled7/screens/Cart.dart';
+import 'package:untitled7/screens/Profile.dart';
+import 'package:untitled7/screens/Order.dart';
+import 'dart:io';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -23,9 +26,14 @@ class _HomePageState extends State<HomePage> {
   Future<List<Map<String, dynamic>>> _fetchProducts() async {
     DatabaseHelper dbHelper = DatabaseHelper();
     final db = await dbHelper.database;
-    final result = await db.query('Products'); // Truy vấn tất cả sản phẩm
+    final result = await db.query(
+      'Products',
+      where: 'status = ?', // Filter by status = 1
+      whereArgs: [1], // Pass 1 as the argument for status
+    );
     return result;
   }
+
 
   // Hàm tìm kiếm sản phẩm
   Future<void> _searchProducts() async {
@@ -58,8 +66,8 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.receipt),
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CartPage())
+                context,
+                MaterialPageRoute(builder: (context) => OrderPage()),
               );
             },
           ),
@@ -68,7 +76,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CartPage())
+                MaterialPageRoute(builder: (context) => CartPage()),
               );
             },
           ),
@@ -76,57 +84,59 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.account_circle),
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ProfilePage())
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePage()),
               );
             },
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Tìm kiếm sản phẩm
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Tìm kiếm sản phẩm',
-                border: OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: _searchProducts,
+      body: SingleChildScrollView(  // Thêm SingleChildScrollView để có thể cuộn
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Tìm kiếm sản phẩm
+              TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  labelText: 'Tìm kiếm sản phẩm',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: _searchProducts,
+                  ),
                 ),
+                onChanged: (value) {
+                  _searchProducts();
+                },
               ),
-              onChanged: (value) {
-                _searchProducts();
-              },
-            ),
-            SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // Tiêu đề danh sách sản phẩm
-            Text(
-              'Danh sách sản phẩm',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
+              // Tiêu đề danh sách sản phẩm
+              const Text(
+                'Danh sách sản phẩm',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
 
-            // Hiển thị danh sách sản phẩm
-            Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
+              // Hiển thị danh sách sản phẩm
+              FutureBuilder<List<Map<String, dynamic>>>(
                 future: _products,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Center(child: Text('Có lỗi xảy ra.'));
+                    return const Center(child: Text('Có lỗi xảy ra.'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('Không có sản phẩm.'));
+                    return const Center(child: Text('Không có sản phẩm.'));
                   } else {
                     final products = snapshot.data!;
                     return GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      shrinkWrap: true, // Cho phép GridView lấy không gian cần thiết
+                      physics: const NeverScrollableScrollPhysics(), // Ngừng cuộn GridView
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
@@ -151,11 +161,14 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Image.network(
-                                  product['image_url'] ?? '',
+                                // Kiểm tra nếu đường dẫn hình ảnh là một tệp local
+                                product['image_url'] != null && product['image_url'].isNotEmpty
+                                    ? Image.file(
+                                  File(product['image_url']), // Đọc hình ảnh từ tệp
                                   height: 100,
                                   fit: BoxFit.cover,
-                                ),
+                                )
+                                    : Container(height: 100), // Nếu không có hình ảnh thì hiển thị khoảng trống
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
@@ -185,8 +198,8 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

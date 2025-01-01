@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:untitled5/Models/databeshelper.dart';
+import 'package:untitled7/Models/databasehelper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -103,6 +103,7 @@ class _AddProductPageState extends State<AddProductPage> {
         'description': description,
         'stock': stock,
         'image_url': imageUrl,
+        'status': 1,
       };
 
       // Lấy database và thêm sản phẩm mới
@@ -115,8 +116,8 @@ class _AddProductPageState extends State<AddProductPage> {
         SnackBar(content: Text('Thêm sản phẩm thành công!')),
       );
 
-      // Quay lại trang quản lý sản phẩm sau khi thêm thành công
-      Navigator.pop(context);
+      // Truyền kết quả thành công về trang trước
+      Navigator.pop(context, true); // true để báo danh sách cần làm mới
     }
   }
 }

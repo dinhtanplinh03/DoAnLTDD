@@ -1,19 +1,20 @@
 class Order {
   int? orderId;
   int customerId;
-  double? totalAmount;
-  String? status;
-  String? orderDate;
+  double totalAmount;
+  int status;
+  String orderDate;
 
+  // Constructor với giá trị mặc định cho status là 1
   Order({
     this.orderId,
     required this.customerId,
-    this.totalAmount,
-    this.status,
-    this.orderDate,
+    required this.totalAmount,
+    this.status = 1, // Giá trị mặc định
+    required this.orderDate,
   });
 
-  // Convert Order object to Map
+  // Chuyển đổi đối tượng thành Map
   Map<String, dynamic> toMap() {
     return {
       'order_id': orderId,
@@ -24,13 +25,13 @@ class Order {
     };
   }
 
-  // Convert Map to Order object
+  // Chuyển Map thành đối tượng Order
   factory Order.fromMap(Map<String, dynamic> map) {
     return Order(
       orderId: map['order_id'],
       customerId: map['customer_id'],
       totalAmount: map['totalAmount'],
-      status: map['status'],
+      status: map['status'] ?? 1, // Nếu không có giá trị status, dùng giá trị mặc định là 1
       orderDate: map['orderDate'],
     );
   }
