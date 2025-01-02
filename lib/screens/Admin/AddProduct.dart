@@ -4,7 +4,9 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class AddProductPage extends StatefulWidget {
-  const AddProductPage({super.key});
+  final Map<String, dynamic>? product;
+  const AddProductPage({super.key, this.product});
+
 
   @override
   _AddProductPageState createState() => _AddProductPageState();
@@ -122,4 +124,5 @@ class _AddProductPageState extends State<AddProductPage> {
       Navigator.pop(context, true); // true để báo danh sách cần làm mới
     }
   }
+
 }

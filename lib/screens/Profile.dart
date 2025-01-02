@@ -14,6 +14,12 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late Future<Map<String, dynamic>> _userProfile;
 
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +62,37 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // Phương thức cập nhật thông tin người dùng
+  Future<void> _updateUserProfile() async {
+    final userId = await PreferencesHelper.getUserId();
+    if (userId == null) {
+      throw Exception("User not logged in");
+    }
+
+    DatabaseHelper dbHelper = DatabaseHelper();
+    final db = await dbHelper.database;
+
+    // Cập nhật dữ liệu
+    await db.update(
+      'Customers',
+      {
+        'name': _nameController.text,
+        'phone': _phoneController.text,
+      },
+      where: 'customer_id = ?',
+      whereArgs: [userId],
+    );
+
+    // Cập nhật dữ liệu mới vào giao diện
+    setState(() {
+      _userProfile = _getUserProfile();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Cập nhật thông tin thành công!')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +101,7 @@ class _ProfilePageState extends State<ProfilePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.exit_to_app),
-            onPressed: () => _logout(context), // Gọi phương thức đăng xuất
+            onPressed: () => _logout(context),
           ),
         ],
       ),
@@ -79,15 +116,39 @@ class _ProfilePageState extends State<ProfilePage> {
             return const Center(child: Text('Không có dữ liệu'));
           } else {
             final user = snapshot.data!;
+            _nameController.text = user['name'];
+            _phoneController.text = user['phone'];
+            _passwordController.text = user['password'];
+            _addressController.text = user['address'];
+
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Số điện thoại: ${user['phone']}'),
-                  Text('Họ tên: ${user['name']}'),
-                  Text('Vai trò: ${user['role']}'),
-                  // Các thông tin khác của người dùng
+                  TextField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(labelText: 'Họ tên'),
+                  ),
+                  TextField(
+                    controller: _phoneController,
+                    decoration: const InputDecoration(labelText: 'Số điện thoại'),
+                    keyboardType: TextInputType.phone,
+                  ),
+                  TextField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(labelText: 'Mật khẩu'),
+                    keyboardType: TextInputType.visiblePassword,
+                  ),
+                  TextField(
+                    controller: _addressController,
+                    decoration: const InputDecoration(labelText: 'Địa chỉ'),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _updateUserProfile,
+                    child: const Text('Cập nhật thông tin'),
+                  ),
                 ],
               ),
             );

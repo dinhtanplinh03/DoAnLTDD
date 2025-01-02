@@ -3,7 +3,7 @@ import 'package:untitled7/Models/databasehelper.dart'; // Đảm bảo bạn có
 import 'package:untitled7/screens/Admin/AddProduct.dart';
 import 'package:untitled7/screens/Login.dart';
 import 'package:untitled7/screens/Order.dart';
-
+import 'package:untitled7/screens/Admin/EditProduct.dart';
 class AdminPage extends StatefulWidget {
   @override
   _AdminPageState createState() => _AdminPageState();
@@ -102,12 +102,21 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
                     itemBuilder: (context, index) {
                       final customer = customers[index];
                       final customerId = customer['customer_id'] ?? -1;
+                      final customerName = customer['name'];
                       final customerPhone = customer['phone'] ?? 'Không có số điện thoại';
                       final customerRole = customer['role'] ?? 'Không xác định';
+                      final customerAddress = customer ['address'];
 
                       return ListTile(
-                        title: Text(customerPhone),
-                        subtitle: Text('Role: $customerRole'),
+                        title: Text(customerName),
+                        subtitle: Column(
+                            children:[
+                              Text('Phone: $customerPhone'),
+                              Text('Address: $customerAddress'),
+                              Text('Role: $customerRole'),
+
+                            ] 
+                        ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -160,6 +169,19 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
                           },
                           child: const Text('Khóa/Mở khóa'),
                         ),
+                        onTap: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) =>
+                                EditProductPage(productId: productId)),
+                          );
+                          if (result == true) {
+                            // Khi quay lại và sản phẩm đã được chỉnh sửa, làm mới danh sách sản phẩm
+                            setState(() {
+                              _products = _fetchProducts(); // Cập nhật lại danh sách sản phẩm
+                            });
+                          }
+                        }
                       );
                     },
                   );
