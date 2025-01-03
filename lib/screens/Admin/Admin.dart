@@ -4,7 +4,11 @@ import 'package:untitled7/screens/Admin/AddProduct.dart';
 import 'package:untitled7/screens/Login.dart';
 import 'package:untitled7/screens/Order.dart';
 import 'package:untitled7/screens/Admin/EditProduct.dart';
+import 'package:untitled7/screens/Admin/OrderDetail.dart';
+
 class AdminPage extends StatefulWidget {
+  const AdminPage({super.key});
+
   @override
   _AdminPageState createState() => _AdminPageState();
 }
@@ -52,9 +56,9 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
 
   // Hàm đăng xuất
   void _logout() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()), // Quay về trang chủ
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => LoginPage()),
+          (Route<dynamic> route) => false,
     );
   }
 
@@ -206,20 +210,40 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
                       final order = orders[index];
                       final orderId = order['order_id'] ?? -1;
                       final orderDate = order['orderDate'] ?? 'Không có ngày';
-                      final totalAmount = order['total_amount'] ?? 0.0;
+                      final totalAmount = order['totalAmount'];
                       final status = order['status'] ?? 0;
                       return ListTile(
                         title: Text('Đơn hàng #$orderId'),
                         subtitle: Text('Ngày: $orderDate'),
-                        trailing: Text(
-                          getStatusText(status),
-                          style: TextStyle(
-                            color: getStatusColor(status),
-                            fontWeight: FontWeight.bold,
-                          ),
+                        trailing: Column(
+                          children:[
+                            Text('Tổng: $totalAmount VND'),
+                            Text(
+                            getStatusText(status),
+                            style: TextStyle(
+                              color: getStatusColor(status),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),]
                         ),
                         onTap: () {
-                          // Xử lý khi nhấn vào đơn hàng, điều hướng đến trang chi tiết đơn hàng
+                          // Điều hướng đến trang chi tiết đơn hàng và truyền dữ liệu
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OrderDetailPage(
+                                orderId: orderId,
+                                orderDate: orderDate,
+                                totalAmount: totalAmount,
+                                status: status,
+                              ),
+                            ),
+                          ).then((_){
+                            // Sau khi quay lại, reload lại danh sách đơn hàng
+                            setState(() {
+                              _orders = _fetchOrders();
+                            });
+                          });
                         },
                       );
                     },
@@ -234,7 +258,7 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
         onPressed: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddProductPage()),
+            MaterialPageRoute(builder: (context) => const AddProductPage()),
           );
 
           if (result == true) {
@@ -243,8 +267,8 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
             });
           }
         },
-        child: const Icon(Icons.add),
         tooltip: 'Thêm sản phẩm mới',
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -329,11 +353,11 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
         });
       } else {
         // Thông báo nếu không tìm thấy sản phẩm
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Không tìm thấy sản phẩm.')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Không tìm thấy sản phẩm.')));
       }
     } catch (e) {
       // Xử lý lỗi nếu có
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Có lỗi xảy ra khi cập nhật trạng thái sản phẩm.')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Có lỗi xảy ra khi cập nhật trạng thái sản phẩm.')));
     }
   }
 

@@ -44,25 +44,4 @@ class Customer {
       status: map['status'] ?? 1,  // Nếu status là null, mặc định là 1
     );
   }
-
-  // Phương thức để tạo một bản sao của đối tượng Customer (nếu cần)
-  Customer copyWith({
-    int? id,
-    String? phone,
-    String? password,
-    String? role,
-    String? name,
-    String? address,
-    int? status,
-  }) {
-    return Customer(
-      customer_id: id ?? customer_id,
-      phone: phone ?? this.phone,
-      password: password ?? this.password,
-      role: role ?? this.role,
-      name: name ?? this.name,
-      address: address ?? this.address,
-      status: status ?? this.status,
-    );
-  }
 }

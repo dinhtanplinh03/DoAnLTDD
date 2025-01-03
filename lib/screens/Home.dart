@@ -166,11 +166,12 @@ class _HomePageState extends State<HomePage> {
                                     ? Image.file(
                                   File(product['image_url']), // Đọc hình ảnh từ tệp
                                   height: 100,
+                                  width: 1000,
                                   fit: BoxFit.cover,
                                 )
                                     : Container(height: 100), // Nếu không có hình ảnh thì hiển thị khoảng trống
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(0.0),
                                   child: Text(
                                     product['name'],
                                     style: const TextStyle(
@@ -180,9 +181,9 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(0.0),
                                   child: Text(
-                                    '\$${product['price']}',
+                                    '${product['price']} VND',
                                     style: const TextStyle(
                                       color: Colors.green,
                                       fontWeight: FontWeight.bold,

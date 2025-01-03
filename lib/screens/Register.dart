@@ -95,16 +95,17 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 16.0),
 
-              // Trường địa chỉ người dùng
+              // Trường mật khẩu
               TextFormField(
-                controller: _addressController,
+                controller: _passwordController,
                 decoration: const InputDecoration(
-                  labelText: 'Địa chỉ',
+                  labelText: 'Mật khẩu',
                   border: OutlineInputBorder(),
                 ),
+                obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Địa chỉ không thể để trống';
+                    return 'Mật khẩu không thể để trống';
                   }
                   return null;
                 },
@@ -127,17 +128,16 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 16.0),
 
-              // Trường mật khẩu
+              // Trường địa chỉ người dùng
               TextFormField(
-                controller: _passwordController,
+                controller: _addressController,
                 decoration: const InputDecoration(
-                  labelText: 'Mật khẩu',
+                  labelText: 'Địa chỉ',
                   border: OutlineInputBorder(),
                 ),
-                obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Mật khẩu không thể để trống';
+                    return 'Địa chỉ không thể để trống';
                   }
                   return null;
                 },

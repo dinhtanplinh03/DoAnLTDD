@@ -55,12 +55,13 @@ class _ProfilePageState extends State<ProfilePage> {
     // Xóa userId khỏi SharedPreferences
     await prefs.remove('userId');
 
-    // Điều hướng về trang đăng nhập
-    Navigator.pushReplacement(
-      context,
+    // Điều hướng về trang đăng nhập và xóa toàn bộ stack
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => const LoginPage()),
+          (Route<dynamic> route) => false, // Xóa tất cả các màn hình trước đó
     );
   }
+
 
   // Phương thức cập nhật thông tin người dùng
   Future<void> _updateUserProfile() async {

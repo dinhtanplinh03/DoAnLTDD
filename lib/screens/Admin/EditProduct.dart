@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 class EditProductPage extends StatefulWidget {
   final int productId;
 
-  const EditProductPage({Key? key, required this.productId}) : super(key: key);
+  const EditProductPage({super.key, required this.productId});
 
   @override
   _EditProductPageState createState() => _EditProductPageState();
@@ -181,7 +181,7 @@ class _EditProductPageState extends State<EditProductPage> {
                   DropdownMenuItem(value: 0, child: Text('Khóa')),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _updateProduct,
                 child: const Text('Cập nhật sản phẩm'),

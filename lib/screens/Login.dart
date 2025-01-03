@@ -75,58 +75,63 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Đăng Nhập'),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Phone Field
-              TextFormField(
-                controller: _phoneController,
-                decoration: const InputDecoration(labelText: 'Số điện thoại'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập số điện thoại';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
+        child: Column(
+          children:[
+            Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Phone Field
+                TextFormField(
+                  controller: _phoneController,
+                  decoration: const InputDecoration(labelText: 'Số điện thoại'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Vui lòng nhập số điện thoại';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
 
-              // Password Field
-              TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Mật khẩu'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập mật khẩu';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
+                // Password Field
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Mật khẩu'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Vui lòng nhập mật khẩu';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
 
-              // Login Button
-              ElevatedButton(
-                onPressed: _loginUser,
-                child: const Text('Đăng nhập'),
-              ),
+                // Login Button
+                ElevatedButton(
+                  onPressed: _loginUser,
+                  child: const Text('Đăng nhập'),
+                ),
 
-              // Register Button (optional)
-              TextButton(
-                onPressed: () {
-                  // Điều hướng đến trang đăng ký (nếu có)
-                  Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const RegisterPage()),);
-                },
-                child: const Text('Chưa có tài khoản? Đăng ký ngay'),
-              ),
-            ],
+                // Register Button (optional)
+                TextButton(
+                  onPressed: () {
+                    // Điều hướng đến trang đăng ký (nếu có)
+                    Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const RegisterPage()),);
+                  },
+                  child: const Text('Chưa có tài khoản? Đăng ký ngay'),
+                ),
+              ],
+            ),
           ),
+          ]
         ),
       ),
     );

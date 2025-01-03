@@ -11,13 +11,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false, // Tắt banner debug
       title: 'App Bán Mỹ Phẩm',
-      theme: ThemeData(
-        primarySwatch: Colors.pink, // Tùy chỉnh màu sắc chính cho ứng dụng
-      ),
-      home: const LoginPage(), // Màn hình đăng nhập là màn hình chính
+      home: LoginPage(), // Màn hình đăng nhập là màn hình chính
     );
   }
   }
