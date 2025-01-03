@@ -30,12 +30,24 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
   }
 
 // Hàm lấy danh sách đơn hàng
-  Future<List<Map<String, dynamic>>> _fetchOrders() async {
+  Future<List<Map<String, dynamic>>> _fetchOrders({DateTime? selectedDate}) async {
     DatabaseHelper dbHelper = DatabaseHelper();
     final db = await dbHelper.database;
-    final result = await db.query('Orders'); // Lấy dữ liệu từ bảng Orders
-    return result;
+
+    if (selectedDate != null) {
+      // Lọc theo ngày đã chọn
+      String formattedDate = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+      return await db.query(
+        'Orders',
+        where: "DATE(orderDate) = ?",
+        whereArgs: [formattedDate],
+      );
+    } else {
+      // Lấy tất cả đơn hàng nếu không có ngày cụ thể
+      return await db.query('Orders');
+    }
   }
+
 
 
   // Hàm lấy danh sách người dùng
@@ -62,6 +74,22 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
     );
   }
 
+  DateTime? _selectedDate;
+
+  void _selectDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+        _orders = _fetchOrders(selectedDate: _selectedDate);
+      });
+    }
+  }
 
 
   @override
@@ -70,9 +98,17 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.exit_to_app),
-            onPressed: _logout,
+          Row(
+            children: [
+              IconButton(
+              icon: const Icon(Icons.exit_to_app),
+              onPressed: _logout,
+            ),
+              IconButton(
+                icon: Icon(Icons.calendar_today),
+                onPressed: _selectDate,
+              ),
+            ]
           ),
         ],
         bottom: TabBar(
