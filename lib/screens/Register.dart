@@ -71,6 +71,8 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Đăng ký tài khoản'),
+        backgroundColor: Colors.lightBlueAccent,
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -148,10 +150,29 @@ class _RegisterPageState extends State<RegisterPage> {
               ElevatedButton(
                 onPressed: () => _registerUser(context),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  textStyle: const TextStyle(fontSize: 16),
+                  backgroundColor: Colors.blue, // Màu nền
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12), // Bo góc nút
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Tăng kích thước nút
+                  elevation: 5, // Tạo hiệu ứng nổi
+                  shadowColor: Colors.black54, // Màu bóng
                 ),
-                child: const Text('Đăng ký'),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.person_add, color: Colors.white, size: 20), // Biểu tượng thêm người
+                    SizedBox(width: 8), // Khoảng cách giữa biểu tượng và văn bản
+                    Text(
+                      'Đăng ký',
+                      style: TextStyle(
+                        color: Colors.white, // Màu chữ
+                        fontSize: 18, // Kích thước chữ
+                        fontWeight: FontWeight.bold, // Đậm chữ
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

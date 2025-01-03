@@ -18,7 +18,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-
+  bool _isPasswordVisible = false; // Trạng thái hiển thị mật khẩu
 
   @override
   void initState() {
@@ -98,7 +98,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Trang cá nhân'),
+        title: const Text('Trang cá nhân', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.lightBlueAccent,
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.exit_to_app),
@@ -112,9 +114,9 @@ class _ProfilePageState extends State<ProfilePage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Có lỗi xảy ra: ${snapshot.error}'));
+            return Center(child: Text('Có lỗi xảy ra: ${snapshot.error}', style: TextStyle(color: Colors.red)));
           } else if (!snapshot.hasData) {
-            return const Center(child: Text('Không có dữ liệu'));
+            return const Center(child: Text('Không có dữ liệu', style: TextStyle(fontSize: 16)));
           } else {
             final user = snapshot.data!;
             _nameController.text = user['name'];
@@ -122,33 +124,90 @@ class _ProfilePageState extends State<ProfilePage> {
             _passwordController.text = user['password'];
             _addressController.text = user['address'];
 
-            return Padding(
+            return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(labelText: 'Họ tên'),
-                  ),
-                  TextField(
-                    controller: _phoneController,
-                    decoration: const InputDecoration(labelText: 'Số điện thoại'),
-                    keyboardType: TextInputType.phone,
-                  ),
-                  TextField(
-                    controller: _passwordController,
-                    decoration: const InputDecoration(labelText: 'Mật khẩu'),
-                    keyboardType: TextInputType.visiblePassword,
-                  ),
-                  TextField(
-                    controller: _addressController,
-                    decoration: const InputDecoration(labelText: 'Địa chỉ'),
+                  Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Thông tin cá nhân',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const Divider(thickness: 1, height: 20),
+                          TextField(
+                            controller: _nameController,
+                            decoration: InputDecoration(
+                              labelText: 'Họ tên',
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                              prefixIcon: const Icon(Icons.person),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: _phoneController,
+                            decoration: InputDecoration(
+                              labelText: 'Số điện thoại',
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                              prefixIcon: const Icon(Icons.phone),
+                            ),
+                            keyboardType: TextInputType.phone,
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: _passwordController,
+                            decoration: InputDecoration(
+                              labelText: 'Mật khẩu',
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                              prefixIcon: const Icon(Icons.lock),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isPasswordVisible = !_isPasswordVisible; // Chuyển đổi trạng thái
+                                  });
+                                },
+                              ),
+                            ),
+                            obscureText: !_isPasswordVisible, // Kiểm soát hiển thị/ẩn mật khẩu
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: _addressController,
+                            decoration: InputDecoration(
+                              labelText: 'Địa chỉ',
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                              prefixIcon: const Icon(Icons.location_on),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _updateUserProfile,
-                    child: const Text('Cập nhật thông tin'),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: _updateUserProfile,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        backgroundColor: Colors.blue,
+                        elevation: 3,
+                      ),
+                      child: const Text(
+                        'Cập nhật thông tin',
+                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                 ],
               ),

@@ -97,6 +97,8 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
+        backgroundColor: Colors.lightBlueAccent,
+        centerTitle: true,
         actions: [
           Row(
             children: [

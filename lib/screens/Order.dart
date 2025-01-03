@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled7/preferences/preferences_helper.dart';
-import 'package:untitled7/Models/databasehelper.dart'; // Đảm bảo đã import DatabaseHelper và Order model
+import 'package:untitled7/Models/databasehelper.dart';
 import 'package:untitled7/Models/Order.dart';
 import 'package:untitled7/screens/OrderDetail.dart';
 
@@ -40,6 +40,9 @@ class OrderPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Đơn hàng'),
+        backgroundColor: Colors.lightBlueAccent,
+        centerTitle: true,
+        elevation: 5.0, // Thêm bóng đổ cho AppBar
       ),
       body: FutureBuilder<int?>(
         future: PreferencesHelper.getUserId(),
@@ -75,23 +78,46 @@ class OrderPage extends StatelessWidget {
 
               // Hiển thị danh sách đơn hàng
               return ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 10.0), // Thêm khoảng cách dọc
                 itemCount: orderSnapshot.data!.length,
                 itemBuilder: (context, index) {
                   final order = orderSnapshot.data![index];
                   return Card(
-                    margin: const EdgeInsets.all(8.0),
+                    margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0), // Bo góc cho Card
+                    ),
+                    elevation: 5.0, // Thêm bóng đổ cho Card
                     child: ListTile(
-                      title: Text('Đơn hàng ${order.orderId}'),
-                      subtitle: Text('Ngày: ${order.orderDate}'),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
+                      title: Text(
+                        'Đơn hàng #${order.orderId}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'Ngày: ${order.orderDate}',
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
                       trailing: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text('Tổng: ${order.totalAmount} VNĐ'),
+                          Text(
+                            'Tổng: ${order.totalAmount} VNĐ',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green[700],
+                            ),
+                          ),
                           Text(
                             getStatusText(order.status), // Hiển thị trạng thái
                             style: TextStyle(
                               color: getStatusColor(order.status),
-                              // Màu sắc tùy thuộc vào trạng thái
                               fontWeight: FontWeight.bold,
                             ),
                           ),

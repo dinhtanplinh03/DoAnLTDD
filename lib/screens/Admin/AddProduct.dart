@@ -37,7 +37,11 @@ class _AddProductPageState extends State<AddProductPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Thêm Sản Phẩm')),
+      appBar: AppBar(
+        title: const Text('Thêm Sản Phẩm'),
+        backgroundColor: Colors.lightBlueAccent,
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

@@ -204,6 +204,8 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Giỏ hàng'),
+        backgroundColor: Colors.lightBlueAccent,
+        centerTitle: true,
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>( // FutureBuilder to load cart items
         future: _cartItems,

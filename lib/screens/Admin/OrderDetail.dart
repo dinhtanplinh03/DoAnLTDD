@@ -78,7 +78,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Chi tiết đơn hàng #${widget.orderId}')),
+      appBar: AppBar(
+        title: Text('Chi tiết đơn hàng #${widget.orderId}'),
+        backgroundColor: Colors.lightBlueAccent,
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

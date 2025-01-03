@@ -34,7 +34,6 @@ class _HomePageState extends State<HomePage> {
     return result;
   }
 
-
   // Hàm tìm kiếm sản phẩm
   Future<void> _searchProducts() async {
     String query = _searchController.text.trim();
@@ -61,6 +60,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trang Chủ'),
+        backgroundColor: Colors.lightBlueAccent, // Slightly deeper blue for a modern look
         actions: [
           IconButton(
             icon: const Icon(Icons.receipt),
@@ -91,7 +91,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(  // Thêm SingleChildScrollView để có thể cuộn
+      body: SingleChildScrollView( // Thêm SingleChildScrollView để có thể cuộn
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -102,7 +102,12 @@ class _HomePageState extends State<HomePage> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   labelText: 'Tìm kiếm sản phẩm',
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.grey[700]),
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[200],
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.search),
                     onPressed: _searchProducts,
@@ -117,7 +122,11 @@ class _HomePageState extends State<HomePage> {
               // Tiêu đề danh sách sản phẩm
               const Text(
                 'Danh sách sản phẩm',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -157,21 +166,30 @@ class _HomePageState extends State<HomePage> {
                             );
                           },
                           child: Card(
-                            elevation: 5,
+                            elevation: 8,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 // Kiểm tra nếu đường dẫn hình ảnh là một tệp local
                                 product['image_url'] != null && product['image_url'].isNotEmpty
-                                    ? Image.file(
-                                  File(product['image_url']), // Đọc hình ảnh từ tệp
-                                  height: 100,
-                                  width: 1000,
-                                  fit: BoxFit.cover,
+                                    ? ClipRRect(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(12),
+                                    topRight: Radius.circular(12),
+                                  ),
+                                  child: Image.file(
+                                    File(product['image_url']), // Đọc hình ảnh từ tệp
+                                    height: 150,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
                                 )
-                                    : Container(height: 100), // Nếu không có hình ảnh thì hiển thị khoảng trống
+                                    : Container(height: 150), // Nếu không có hình ảnh thì hiển thị khoảng trống
                                 Padding(
-                                  padding: const EdgeInsets.all(0.0),
+                                  padding: const EdgeInsets.all(8.0),
                                   child: Text(
                                     product['name'],
                                     style: const TextStyle(
@@ -181,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.all(0.0),
+                                  padding: const EdgeInsets.all(8.0),
                                   child: Text(
                                     '${product['price']} VND',
                                     style: const TextStyle(

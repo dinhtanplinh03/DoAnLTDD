@@ -4,7 +4,7 @@ import 'package:untitled7/screens/Home.dart';  // Giả sử bạn có trang Hom
 import 'package:untitled7/screens/Admin/Admin.dart';
 import 'package:untitled7/screens/Register.dart';// Giả sử bạn có trang AdminPage cho quản trị viên
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:untitled7/screens/ResetPass.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,17 +18,10 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  Future<int?> _getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('userId') ?? 0; // Trả về 0 nếu không tìm thấy 'userId'
-  }
-
-
   Future<void> _loginUser() async {
     final phone = _phoneController.text;
     final password = _passwordController.text;
 
-    // Kiểm tra thông tin đăng nhập, chỉ lấy tài khoản có status = 1 (mở khóa)
     DatabaseHelper dbHelper = DatabaseHelper();
     final db = await dbHelper.database;
     final result = await db.query(
@@ -38,28 +31,23 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     if (result.isNotEmpty) {
-      // Lưu id vào SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       final userId = result[0]['customer_id'] as int;  // Ép kiểu từ Object? sang int
       await prefs.setInt('userId', userId);  // Lưu ID người dùng
 
-      // Kiểm tra role
       String role = result[0]['role'] as String;
       if (role == 'admin') {
-        // Nếu là admin, điều hướng đến trang admin
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) =>AdminPage()),
+          MaterialPageRoute(builder: (context) => AdminPage()),
         );
       } else {
-        // Nếu là user, điều hướng đến trang chủ
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
         );
       }
     } else {
-      // Nếu không tìm thấy người dùng trong DB hoặc tài khoản bị khóa
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Đăng nhập không thành công hoặc tài khoản bị khóa.')),
       );
@@ -67,71 +55,209 @@ class _LoginPageState extends State<LoginPage> {
   }
 
 
+  Future<void> _resetPassword() async {
+    final phone = _phoneController.text;
 
+    if (phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng nhập số điện thoại')),
+      );
+      return;
+    }
 
+    DatabaseHelper dbHelper = DatabaseHelper();
+    final db = await dbHelper.database;
+    final result = await db.query(
+      'Customers',
+      where: 'phone = ? AND status = 1', // Check if the phone number exists and status = 1
+      whereArgs: [phone],
+    );
+
+    if (result.isNotEmpty) {
+      // If the phone exists, show a dialog to set a new password
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          final _newPasswordController = TextEditingController();
+          return AlertDialog(
+            title: const Text('Đặt mật khẩu mới'),
+            content: TextFormField(
+              controller: _newPasswordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Mật khẩu mới',
+                prefixIcon: Icon(Icons.lock),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Vui lòng nhập mật khẩu mới';
+                }
+                return null;
+              },
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Hủy'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final newPassword = _newPasswordController.text;
+                  if (newPassword.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Vui lòng nhập mật khẩu mới')),
+                    );
+                    return;
+                  }
+
+                  // Update password in the database
+                  await db.update(
+                    'Customers',
+                    {'password': newPassword},
+                    where: 'phone = ?',
+                    whereArgs: [phone],
+                  );
+
+                  Navigator.pop(context);  // Close dialog
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Mật khẩu đã được thay đổi thành công')),
+                  );
+                },
+                child: const Text('Đặt lại mật khẩu'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Số điện thoại không tồn tại hoặc tài khoản bị khóa')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Đăng Nhập'),
+        title: const Text('HUSUKA', style: TextStyle(color: Colors.white),),
+        backgroundColor: Colors.lightBlueAccent,
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children:[
-            Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Phone Field
-                TextFormField(
-                  controller: _phoneController,
-                  decoration: const InputDecoration(labelText: 'Số điện thoại'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Vui lòng nhập số điện thoại';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 8,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'Đăng Nhập',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.lightBlueAccent,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
 
-                // Password Field
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Mật khẩu'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Vui lòng nhập mật khẩu';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
+                    // Phone Field
+                    TextFormField(
+                      controller: _phoneController,
+                      decoration: InputDecoration(
+                        labelText: 'Số điện thoại',
+                        prefixIcon: const Icon(Icons.phone),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập số điện thoại';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
 
-                // Login Button
-                ElevatedButton(
-                  onPressed: _loginUser,
-                  child: const Text('Đăng nhập'),
-                ),
+                    // Password Field
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Mật khẩu',
+                        prefixIcon: const Icon(Icons.lock),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập mật khẩu';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 24),
 
-                // Register Button (optional)
-                TextButton(
-                  onPressed: () {
-                    // Điều hướng đến trang đăng ký (nếu có)
-                    Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const RegisterPage()),);
-                  },
-                  child: const Text('Chưa có tài khoản? Đăng ký ngay'),
+                    // Login Button
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        backgroundColor: Colors.lightBlueAccent,
+                      ),
+                      onPressed: _loginUser,
+                      child: const Text('Đăng nhập', style: TextStyle(fontSize: 16)),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Register Button
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const RegisterPage()),
+                        );
+                      },
+                      child: const Text(
+                        'Chưa có tài khoản? Đăng ký ngay',
+                        style: TextStyle(color: Colors.lightBlueAccent),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Reset Pass
+                    TextButton(
+                      onPressed: (){
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => const ResetPassPage()),
+                        );
+                        },
+                      child: const Text(
+                        'Quên mật khẩu',
+                        style: TextStyle(color: Colors.lightBlueAccent),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-          ]
         ),
       ),
     );
